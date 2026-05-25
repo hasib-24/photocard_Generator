@@ -511,12 +511,15 @@
 
   .section-body {
     padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
   .subsection-group {
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #f0f2f8;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
   }
 
   .subsection-group:last-child {
@@ -663,7 +666,7 @@
     <!-- Name & Years -->
     <div class="form-group full">
       <label>ব্যক্তির নাম (বাংলা/ইংরেজি)</label>
-      <input id="fName" type="text" value="রাজা রামমোহন রায়" oninput="updateCard()">
+      <input id="fName" type="text" value="রাজা রামম���হন রায়" oninput="updateCard()">
     </div>
     <div class="form-group">
       <label>জন্ম-মৃত্যু সাল</label>
@@ -832,7 +835,7 @@ const defaultSections = [
     wide: true,
     subsections: [
       {
-        title: "প্রকাশিত সম্পাদনা",
+        title: "প্রকাশিত স���্পাদনা",
         icon: "📖",
         items: [
           "ব্রাহ্মণসেবধি (१८२१)",
@@ -861,7 +864,7 @@ const defaultSections = [
         icon: "🏫",
         items: [
           "१८२२ খ্রিস্টাব্দে কলকাতায় 'অ্যাংলো হিন্দু স্কুল' প্রতিষ্ঠা",
-          "१८२८ সালে ব্রাহ্মসভা প্রতিষ্ঠা (পরবর্তীতে ব্রাহ্মসমাজ)"
+          "१८२८ সালে ব্রাহ্মসভা প্রতিষ্ঠা (পরবর্তী���ে ব্রাহ্মসমাজ)"
         ]
       }
     ]
@@ -886,7 +889,7 @@ function renderDynSections() {
           <input type="text" value="${sub.title}" placeholder="সাব-সেকশন শিরোনাম" oninput="sections[${i}].subsections[${subI}].title=this.value;renderCard()" style="flex:1;">
           <button class="remove-btn-subsection" onclick="sections[${i}].subsections.splice(${subI},1);renderDynSections();renderCard();">×</button>
         </div>
-        <textarea placeholder="বুলেট পয়েন্ট (প্রতিটি লাইনে একটি)" oninput="sections[${i}].subsections[${subI}].items=this.value.split('\\n').filter(l=>l.trim())" style="width:100%;">${sub.items.join('\n')}</textarea>
+        <textarea placeholder="বুলেট পয়েন্ট (প্রতিটি লাইনে একটি)" oninput="sections[${i}].subsections[${subI}].items=this.value.split('\\n').filter(l=>l.trim())">${sub.items.join('\n')}</textarea>
       </div>
     `).join('');
 
@@ -906,7 +909,7 @@ function renderDynSections() {
       <div class="sub-sections-container">
         <h4 style="color:#5bc0de;font-size:0.75rem;margin-bottom:8px;">📌 সাব-সেকশন</h4>
         ${subsectionsHTML}
-        <button class="add-subsection-btn" onclick="sections[${i}].subsections.push({title:'নতুন সাব-সেকশন',icon:'📌',items:['তথ্য १']});renderDynSections();renderCard();">+ সাব-সেকশন</button>
+        <button class="add-subsection-btn" onclick="sections[${i}].subsections.push({title:'নতুন সাব-সেকশন',icon:'📌',items:['তথ্য १']});renderDynSections();renderCard()">+ সাব-সেকশন যোগ করুন</button>
       </div>
     `;
     container.appendChild(div);
@@ -998,54 +1001,91 @@ function applyColors() {
 
 function syncColor(name) {
   const textVal = document.getElementById('colorText' + name).value;
-  document.getElementById('color' + name).value = textVal;
-  applyColors();
+  const colorInput = document.getElementById('color' + name);
+  if (/^#[0-9A-F]{6}$/i.test(textVal)) {
+    colorInput.value = textVal;
+    applyColors();
+  }
 }
 
 function uploadImage(input) {
   const file = input.files[0];
   if (!file) return;
+  
   const reader = new FileReader();
   reader.onload = (e) => {
-    const imgBox = document.getElementById('personImgBox');
-    imgBox.innerHTML = `<img src="${e.target.result}" alt="ব্যক্তির ছবি">`;
-    document.getElementById('previewThumb').src = e.target.result;
-    document.getElementById('previewThumb').style.display = 'block';
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 130;
+      canvas.height = 160;
+      const ctx = canvas.getContext('2d');
+      const imgWidth = img.width;
+      const imgHeight = img.height;
+      const imgAspect = imgWidth / imgHeight;
+      const canvasAspect = 130 / 160;
+      
+      let sx, sy, sw, sh;
+      if (imgAspect > canvasAspect) {
+        sh = imgHeight;
+        sw = imgHeight * canvasAspect;
+        sx = (imgWidth - sw) / 2;
+        sy = 0;
+      } else {
+        sw = imgWidth;
+        sh = imgWidth / canvasAspect;
+        sx = 0;
+        sy = (imgHeight - sh) / 2;
+      }
+      
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 130, 160);
+      const imageSrc = canvas.toDataURL();
+      
+      const personImgBox = document.getElementById('personImgBox');
+      personImgBox.innerHTML = `<img src="${imageSrc}">`;
+      
+      const thumb = document.getElementById('previewThumb');
+      thumb.src = imageSrc;
+      thumb.style.display = 'block';
+      
+      localStorage.setItem('photocard_image', imageSrc);
+      markUnsaved();
+    };
   };
   reader.readAsDataURL(file);
 }
 
 function markUnsaved() {
+  const indicator = document.getElementById('saveIndicator');
+  indicator.textContent = 'অপরিবর্তিত';
+  indicator.style.color = '#ff9999';
   clearTimeout(autoSaveTimeout);
-  document.getElementById('saveIndicator').textContent = 'সংরক্ষিত নয়';
-  document.getElementById('saveIndicator').style.color = '#f5a623';
-  autoSaveTimeout = setTimeout(() => {
-    saveData();
-  }, 3000);
+  autoSaveTimeout = setTimeout(saveData, 3000);
 }
 
 function saveData() {
   const data = {
-    name: document.getElementById('fName').value,
-    years: document.getElementById('fYears').value,
-    subtitle: document.getElementById('fSubtitle').value,
-    birth: document.getElementById('fBirth').value,
-    birthplace: document.getElementById('fBirthplace').value,
-    death: document.getElementById('fDeath').value,
-    deathplace: document.getElementById('fDeathplace').value,
-    title: document.getElementById('fTitle').value,
-    website: document.getElementById('fWebsite').value,
-    tag: document.getElementById('fTag').value,
+    sections: sections,
     colorPrimary: document.getElementById('colorPrimary').value,
     colorAccent: document.getElementById('colorAccent').value,
-    sections: sections,
-    personImage: document.getElementById('personImgBox').innerHTML
+    fName: document.getElementById('fName').value,
+    fYears: document.getElementById('fYears').value,
+    fSubtitle: document.getElementById('fSubtitle').value,
+    fBirth: document.getElementById('fBirth').value,
+    fBirthplace: document.getElementById('fBirthplace').value,
+    fDeath: document.getElementById('fDeath').value,
+    fDeathplace: document.getElementById('fDeathplace').value,
+    fTitle: document.getElementById('fTitle').value,
+    fWebsite: document.getElementById('fWebsite').value,
+    fTag: document.getElementById('fTag').value
   };
   
-  localStorage.setItem('photoCardData', JSON.stringify(data));
+  localStorage.setItem('photocard_data', JSON.stringify(data));
   
-  document.getElementById('saveIndicator').textContent = 'সংরক্ষিত ✓';
-  document.getElementById('saveIndicator').style.color = '#27ae60';
+  const indicator = document.getElementById('saveIndicator');
+  indicator.textContent = 'সংরক্ষিত';
+  indicator.style.color = '#5bc0de';
   
   const notification = document.getElementById('saveNotification');
   notification.classList.add('show');
@@ -1055,51 +1095,53 @@ function saveData() {
 }
 
 function loadData() {
-  const saved = localStorage.getItem('photoCardData');
+  const saved = localStorage.getItem('photocard_data');
   if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      document.getElementById('fName').value = data.name || '';
-      document.getElementById('fYears').value = data.years || '';
-      document.getElementById('fSubtitle').value = data.subtitle || '';
-      document.getElementById('fBirth').value = data.birth || '';
-      document.getElementById('fBirthplace').value = data.birthplace || '';
-      document.getElementById('fDeath').value = data.death || '';
-      document.getElementById('fDeathplace').value = data.deathplace || '';
-      document.getElementById('fTitle').value = data.title || '';
-      document.getElementById('fWebsite').value = data.website || '';
-      document.getElementById('fTag').value = data.tag || '';
-      document.getElementById('colorPrimary').value = data.colorPrimary || '#1a3a6e';
-      document.getElementById('colorAccent').value = data.colorAccent || '#f5a623';
-      
-      if (data.sections) sections = data.sections;
-      if (data.personImage) document.getElementById('personImgBox').innerHTML = data.personImage;
-      
-      updateCard();
-      renderDynSections();
-    } catch (e) {
-      console.error('লোড করতে ত্রুটি:', e);
-    }
+    const data = JSON.parse(saved);
+    sections = data.sections || sections;
+    document.getElementById('colorPrimary').value = data.colorPrimary || '#1a3a6e';
+    document.getElementById('colorAccent').value = data.colorAccent || '#f5a623';
+    document.getElementById('fName').value = data.fName || 'রাজা রামমোহন রায়';
+    document.getElementById('fYears').value = data.fYears || '(१७७२ - १८३३)';
+    document.getElementById('fSubtitle').value = data.fSubtitle || 'ভারতীয় সমাজ সংস্কারক';
+    document.getElementById('fBirth').value = data.fBirth || '२२ मे, १७७२';
+    document.getElementById('fBirthplace').value = data.fBirthplace || 'রাধানগর, বেঙ্গল প্রেসিডেন্সি';
+    document.getElementById('fDeath').value = data.fDeath || '०२७ सेप्टेम्बर १८३३';
+    document.getElementById('fDeathplace').value = data.fDeathplace || 'স্টাপলেটন, ব্রিস্টল, ইংল্যান্ড';
+    document.getElementById('fTitle').value = data.fTitle || 'রাজা' [মুঘল সম্রাট দ্বিতীয় আকবর শাহ প্রদত্ত]';
+    document.getElementById('fWebsite').value = data.fWebsite || 'www.livemcq.com';
+    document.getElementById('fTag').value = data.fTag || 'BCS Special';
   }
+  
+  const savedImage = localStorage.getItem('photocard_image');
+  if (savedImage) {
+    const personImgBox = document.getElementById('personImgBox');
+    personImgBox.innerHTML = `<img src="${savedImage}">`;
+    const thumb = document.getElementById('previewThumb');
+    thumb.src = savedImage;
+    thumb.style.display = 'block';
+  }
+  
+  renderDynSections();
+  updateCard();
 }
 
 function downloadCard() {
   const card = document.getElementById('photoCard');
-  html2canvas(card, { scale: 2, useCORS: true }).then(canvas => {
+  html2canvas(card, {
+    backgroundColor: '#fff',
+    scale: 2,
+    allowTaint: true,
+    useCORS: true
+  }).then(canvas => {
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
-    link.download = `photocard-${document.getElementById('fName').value.replace(/\s+/g, '_')}.png`;
+    link.download = 'photocard.png';
     link.click();
   });
 }
 
-// Initialize on page load
-window.addEventListener('DOMContentLoaded', () => {
-  loadData();
-  renderDynSections();
-  renderCard();
-  updateCard();
-});
+document.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
