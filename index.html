@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ফটোকার্ড টেমপ্লেট</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 30px 20px;
+    font-family: 'Hind Siliguri', sans-serif;
+  }
+
+  /* ── Save Notification ── */
+  .save-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #27ae60;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+  }
+
+  .save-notification.show {
+    display: block;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* ── Editor Panel ── */
+  .editor-panel {
+    background: #16213e;
+    border: 1px solid #0f3460;
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 30px;
+    color: #e0e0e0;
+  }
+
+  .editor-panel h2 {
+    color: #f5a623;
+    font-size: 1.2rem;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #0f3460;
+    padding-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .save-indicator {
+    font-size: 0.8rem;
+    color: #5bc0de;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.78rem;
+    color: #a0b4c8;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  input, textarea, select {
+    background: #0f3460;
+    border: 1px solid #1a4a7a;
+    border-radius: 8px;
+    color: #e8f0fe;
+    padding: 8px 12px;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+    outline: none;
+    width: 100%;
+  }
+
+  input:focus, textarea:focus { border-color: #f5a623; }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .color-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  input[type="color"] {
+    width: 44px;
+    height: 36px;
+    padding: 2px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .section-adder {
+    background: #0f3460;
+    border: 1px dashed #1a6aa5;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 14px;
+  }
+
+  .section-adder h3 {
+    color: #5bc0de;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+  }
+
+  .dynamic-sections { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+
+  .dyn-section {
+    background: #0a2540;
+    border: 1px solid #1a4a7a;
+    border-radius: 8px;
+    padding: 12px;
+    position: relative;
+  }
+
+  .dyn-section-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .dyn-section-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn-move {
+    background: #1a4a7a;
+    border: none;
+    color: #e0e0e0;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .btn-move:hover { background: #1a6aa5; }
+  .btn-move:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .dyn-section input, .dyn-section textarea {
+    margin-bottom: 6px;
+  }
+
+  .sub-sections-container {
+    background: #051828;
+    border: 1px dashed #0f3460;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .sub-section {
+    background: #0f3460;
+    border: 1px solid #1a4a7a;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .sub-section:last-child { margin-bottom: 0; }
+
+  .sub-section-header {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: #c0392b;
+    border: none;
+    color: white;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .remove-btn-subsection {
+    background: #c0392b;
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #f5a623, #e67e22);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 14px;
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,166,35,0.4); }
+
+  .btn-secondary {
+    background: #1a4a7a;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-secondary:hover { background: #1a6aa5; }
+
+  .btn-save {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    color: white;
+  }
+
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39,174,96,0.4);
+  }
+
+  /* ── CARD ── */
+  .card-wrapper {
+    width: 700px;
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  }
+
+  /* Header */
+  .card-header {
+    background: var(--primary, #1a3a6e);
+    padding: 28px 30px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+
+  .card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 40%;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .brand-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .brand-logo {
+    background: white;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1a3a6e;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .brand-logo span { color: #f5a623; }
+
+  .brand-tag {
+    background: var(--accent, #f5a623);
+    color: #1a1a2e;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .header-content {
+    display: flex;
+    gap: 24px;
+    align-items: flex-end;
+    position: relative;
+    z-index: 2;
+  }
+
+  .person-image {
+    width: 130px;
+    height: 160px;
+    border-radius: 12px;
+    border: 3px solid var(--accent, #f5a623);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  .person-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 9px;
+  }
+
+  .person-info { flex: 1; color: white; }
+
+  .person-title {
+    font-size: 0.8rem;
+    color: var(--accent, #f5a623);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .person-name {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .person-years {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 10px;
+  }
+
+  .person-subtitle {
+    display: inline-block;
+    background: var(--accent, #f5a623);
+    color: #1a1a2e;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 5px 16px;
+    border-radius: 20px;
+  }
+
+  /* Bio Bar */
+  .bio-bar {
+    background: var(--secondary, #f0f4ff);
+    padding: 16px 30px;
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .bio-item {
+    flex: 1;
+    min-width: 150px;
+    padding: 0 16px;
+    border-right: 2px solid rgba(0,0,0,0.1);
+  }
+
+  .bio-item:first-child { padding-left: 0; }
+  .bio-item:last-child { border-right: none; }
+
+  .bio-label {
+    font-size: 0.7rem;
+    color: #666;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 4px;
+  }
+
+  .bio-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary, #1a3a6e);
+    line-height: 1.2;
+  }
+
+  .bio-sub {
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  /* Title Badge */
+  .title-badge {
+    background: linear-gradient(135deg, var(--accent, #f5a623) 0%, #e67e22 100%);
+    padding: 12px 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .title-badge-icon { font-size: 1.3rem; }
+
+  .title-badge-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  /* Body */
+  .card-body {
+    background: #fafbff;
+    padding: 24px 30px;
+  }
+
+  .sections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .section-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+    border: 1px solid #e8ecf8;
+  }
+
+  .section-card.wide { grid-column: 1 / -1; }
+
+  .section-header {
+    background: var(--primary, #1a3a6e);
+    color: white;
+    padding: 10px 16px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-header .icon {
+    background: rgba(255,255,255,0.2);
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  .section-body {
+    padding: 12px 16px;
+  }
+
+  .subsection-group {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f2f8;
+  }
+
+  .subsection-group:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+
+  .subsection-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary, #1a3a6e);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .subsection-icon {
+    font-size: 0.75rem;
+  }
+
+  .bullet-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0 5px 20px;
+    font-size: 0.82rem;
+    color: #333;
+    line-height: 1.4;
+  }
+
+  .bullet-dot {
+    width: 6px; height: 6px;
+    background: var(--accent, #f5a623);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+    position: relative;
+    left: -14px;
+  }
+
+  /* Footer */
+  .card-footer {
+    background: var(--primary, #1a3a6e);
+    padding: 14px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-brand {
+    color: white;
+    font-size: 0.78rem;
+    opacity: 0.7;
+  }
+
+  .footer-url {
+    color: var(--accent, #f5a623);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  /* Download btn */
+  .download-area {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* Image upload */
+  .img-upload-label {
+    display: block;
+    background: #0f3460;
+    border: 2px dashed #1a6aa5;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    color: #a0b4c8;
+    font-size: 0.82rem;
+    transition: border-color 0.2s;
+  }
+
+  .img-upload-label:hover { border-color: #f5a623; color: #f5a623; }
+  #imgFileInput { display: none; }
+
+  .preview-thumb {
+    width: 60px; height: 70px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid #f5a623;
+    display: none;
+    margin: 6px auto 0;
+  }
+
+  .add-subsection-btn {
+    background: #0f3460;
+    border: 1px dashed #5bc0de;
+    color: #5bc0de;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .add-subsection-btn:hover {
+    border-color: #f5a623;
+    color: #f5a623;
+  }
+</style>
+</head>
+<body>
+
+<!-- Save Notification -->
+<div class="save-notification" id="saveNotification">✓ স্বয়ংক্রিয়ভাবে সংরক্ষিত হয়েছে</div>
+
+<!-- ── EDITOR ── -->
+<div class="editor-panel">
+  <h2>
+    ✏️ ফটোকার্ড এডিটর
+    <span class="save-indicator" id="saveIndicator">সংরক্ষিত</span>
+  </h2>
+
+  <div class="form-grid">
+    <!-- Colors -->
+    <div class="form-group">
+      <label>প্রাইমারি রং</label>
+      <div class="color-row">
+        <input type="color" id="colorPrimary" value="#1a3a6e" oninput="applyColors()">
+        <input type="text" id="colorPrimaryText" value="#1a3a6e" oninput="syncColor('Primary')" placeholder="#1a3a6e">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>অ্যাকসেন্ট রং</label>
+      <div class="color-row">
+        <input type="color" id="colorAccent" value="#f5a623" oninput="applyColors()">
+        <input type="text" id="colorAccentText" value="#f5a623" oninput="syncColor('Accent')" placeholder="#f5a623">
+      </div>
+    </div>
+
+    <!-- Name & Years -->
+    <div class="form-group full">
+      <label>ব্যক্তির নাম (বাংলা/ইংরেজি)</label>
+      <input id="fName" type="text" value="রাজা রামমোহন রায়" oninput="updateCard()">
+    </div>
+    <div class="form-group">
+      <label>জন্ম-মৃত্যু সাল</label>
+      <input id="fYears" type="text" value="(१७७२ - १८३३)" oninput="updateCard()">
+    </div>
+    <div class="form-group">
+      <label>পরিচয় (ট্যাগলাইন)</label>
+      <input id="fSubtitle" type="text" value="ভারতীয় সমাজ সংস্কারক" oninput="updateCard()">
+    </div>
+
+    <!-- Bio Fields -->
+    <div class="form-group">
+      <label>জন্ম তারিখ</label>
+      <input id="fBirth" type="text" value="२२ मे, १७७२" oninput="updateCard()">
+    </div>
+    <div class="form-group">
+      <label>জন্মস্থান</label>
+      <input id="fBirthplace" type="text" value="রাধানগর, বেঙ্গল প্রেসিডেন্সি" oninput="updateCard()">
+    </div>
+    <div class="form-group">
+      <label>মৃত্যু তারিখ</label>
+      <input id="fDeath" type="text" value="०२७ सेप्टेम्बर १८३३" oninput="updateCard()">
+    </div>
+    <div class="form-group">
+      <label>মৃত্যুস্থান</label>
+      <input id="fDeathplace" type="text" value="স্টাপলেটন, ব্রিস্টল, ইংল্যান্ড" oninput="updateCard()">
+    </div>
+
+    <div class="form-group full">
+      <label>উপাধি / পুরস্কার</label>
+      <input id="fTitle" type="text" value="রাজা' [মুঘল সম্রাট দ্বিতীয় আকবর শাহ প্রদত্ত]" oninput="updateCard()">
+    </div>
+
+    <!-- Image -->
+    <div class="form-group full">
+      <label>ব্যক্তির ছবি আপলোড করুন</label>
+      <label class="img-upload-label" for="imgFileInput">
+        📷 ছবি বেছে নিন (JPG/PNG)
+        <img id="previewThumb" class="preview-thumb">
+      </label>
+      <input type="file" id="imgFileInput" accept="image/*" onchange="uploadImage(this)">
+    </div>
+
+    <!-- Brand -->
+    <div class="form-group">
+      <label>ওয়েবসাইট</label>
+      <input id="fWebsite" type="text" value="www.livemcq.com" oninput="updateCard()">
+    </div>
+    <div class="form-group">
+      <label>ট্যাগ টেক্সট</label>
+      <input id="fTag" type="text" value="BCS Special" oninput="updateCard()">
+    </div>
+  </div>
+
+  <!-- Dynamic Sections -->
+  <div class="section-adder">
+    <h3>📂 সেকশন যোগ করুন (নেস্টেড সাব-সেকশন সহ)</h3>
+    <div class="dynamic-sections" id="dynSections"></div>
+    <button class="btn-secondary" style="margin-top:10px" onclick="addSection()">+ নতুন সেকশন</button>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn-primary btn-save" onclick="saveData()">💾 সংরক্ষণ করুন</button>
+    <button class="btn-primary" onclick="updateCard()">🔄 কার্ড আপডেট করুন</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,#27ae60,#1e8449)" onclick="downloadCard()">⬇️ PNG ডাউনলোড করুন</button>
+  </div>
+</div>
+
+<!-- ── CARD ── -->
+<div class="card-wrapper" id="photoCard">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="brand-row">
+      <div class="brand-logo">
+        <span>📚</span> FlashMind <span>BCS</span>
+      </div>
+      <div class="brand-tag" id="cTag">BCS Special</div>
+    </div>
+
+    <div class="header-content">
+      <div class="person-image" id="personImgBox">
+        <span>ছবি<br>আপলোড<br>করুন</span>
+      </div>
+      <div class="person-info">
+        <div class="person-title">বিশেষ ব্যক্তিত্ব</div>
+        <div class="person-name" id="cName">রাজা রামমোহন রায়</div>
+        <div class="person-years" id="cYears">(१७७२ - १८३३)</div>
+        <div class="person-subtitle" id="cSubtitle">ভারতীয় সমাজ সংস্কারক</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bio Bar -->
+  <div class="bio-bar">
+    <div class="bio-item">
+      <div class="bio-label">📅 জন্ম</div>
+      <div class="bio-value" id="cBirth">२२ मे, १७७२</div>
+      <div class="bio-sub" id="cBirthplace">রাধানগর, বেঙ্গল প্রেসিডেন্সি</div>
+    </div>
+    <div class="bio-item">
+      <div class="bio-label">🪦 মৃত্যু</div>
+      <div class="bio-value" id="cDeath">०२७ सेप्टेम्बर १८३३</div>
+      <div class="bio-sub" id="cDeathplace">স্টাপলেটন, ব্রিস্টল</div>
+    </div>
+  </div>
+
+  <!-- Title Badge -->
+  <div class="title-badge" id="titleBadgeRow">
+    <span class="title-badge-icon">👑</span>
+    <span class="title-badge-text" id="cTitle">রাজা' [মুঘল সম্রাট দ্বিতীয় আকবর শাহ প্রদত্ত]</span>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+    <div class="sections-grid" id="cardSectionsGrid">
+      <!-- Default sections inserted by JS -->
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="card-footer">
+    <div class="footer-brand">সকল তথ্য যাচাইকৃত ও নির্ভরযোগ্য</div>
+    <a class="footer-url" id="cWebsite">www.livemcq.com</a>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+
+// ── Default data ──
+const defaultSections = [
+  {
+    icon: "🎓",
+    title: "লেখাপড়া",
+    wide: false,
+    subsections: [
+      {
+        title: "ভাষাজ্ঞান",
+        icon: "🗣️",
+        items: [
+          "সংস্কৃত, ফারসি এবং ইংরেজি ভাষার একজন মহান পণ্ডিত",
+          "আরবি, ল্যাটিন এবং গ্রীক ভাষাও জানতেন"
+        ]
+      }
+    ]
+  },
+  {
+    icon: "🤝",
+    title: "পরিচিতি",
+    wide: false,
+    subsections: [
+      {
+        title: "সামাজিক আন্দোলন",
+        icon: "⚡",
+        items: [
+          "সতীদাহ প্রথা বিলোপ আন্দোলনের প্রধান পথিকৃৎ",
+          "লর্ড উইলিয়াম বেন্টিঙ্ক সতীদাহ প্রথাকে আইনত নিষিদ্ধ করেন"
+        ]
+      }
+    ]
+  },
+  {
+    icon: "✍️",
+    title: "সাহিত্যকর্ম",
+    wide: true,
+    subsections: [
+      {
+        title: "প্রকাশিত সম্পাদনা",
+        icon: "📖",
+        items: [
+          "ব্রাহ্মণসেবধি (१८२१)",
+          "সম্বাদ কৌমুদী",
+          "ফারসি ভাষায় 'মিরাত-উল-আখবার' (१८२२)"
+        ]
+      },
+      {
+        title: "গুরুত্বপূর্ণ কর্মসমূহ",
+        icon: "📚",
+        items: [
+          "বেদান্তগ্রন্থ — বেদান্তসার",
+          "গোস্বামীর সহিত বিচার",
+          "গৌড়ীয় ব্যাকরণ (१८२६)"
+        ]
+      }
+    ]
+  },
+  {
+    icon: "🏛️",
+    title: "প্রতিষ্ঠানিক কাজ",
+    wide: false,
+    subsections: [
+      {
+        title: "স্থাপিত প্রতিষ্ঠান",
+        icon: "🏫",
+        items: [
+          "१८२२ খ্রিস্টাব্দে কলকাতায় 'অ্যাংলো হিন্দু স্কুল' প্রতিষ্ঠা",
+          "१८२८ সালে ব্রাহ্মসভা প্রতিষ্ঠা (পরবর্তীতে ব্রাহ্মসমাজ)"
+        ]
+      }
+    ]
+  }
+];
+
+let sections = JSON.parse(JSON.stringify(defaultSections));
+let lastSaveTime = new Date();
+let autoSaveTimeout;
+
+function renderDynSections() {
+  const container = document.getElementById('dynSections');
+  container.innerHTML = '';
+  sections.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'dyn-section';
+    
+    let subsectionsHTML = s.subsections.map((sub, subI) => `
+      <div class="sub-section">
+        <div class="sub-section-header">
+          <input type="text" value="${sub.icon}" placeholder="আইকন" oninput="sections[${i}].subsections[${subI}].icon=this.value;renderCard()" style="width:50px;font-size:0.9rem;">
+          <input type="text" value="${sub.title}" placeholder="সাব-সেকশন শিরোনাম" oninput="sections[${i}].subsections[${subI}].title=this.value;renderCard()" style="flex:1;">
+          <button class="remove-btn-subsection" onclick="sections[${i}].subsections.splice(${subI},1);renderDynSections();renderCard();">×</button>
+        </div>
+        <textarea placeholder="বুলেট পয়েন্ট (প্রতিটি লাইনে একটি)" oninput="sections[${i}].subsections[${subI}].items=this.value.split('\\n').filter(l=>l.trim())" style="width:100%;">${sub.items.join('\n')}</textarea>
+      </div>
+    `).join('');
+
+    div.innerHTML = `
+      <button class="remove-btn" onclick="removeSection(${i})">×</button>
+      <div class="dyn-section-header">
+        <input type="text" value="${s.icon}" placeholder="আইকন (ইমোজি)" oninput="sections[${i}].icon=this.value;renderCard()" style="width:60px;font-size:0.9rem;">
+        <input type="text" value="${s.title}" placeholder="সেকশন শিরোনাম" oninput="sections[${i}].title=this.value;renderCard()" style="flex:1;">
+        <div class="dyn-section-controls">
+          <button class="btn-move" onclick="moveSection(${i}, -1)" ${i === 0 ? 'disabled' : ''}>⬆️</button>
+          <button class="btn-move" onclick="moveSection(${i}, 1)" ${i === sections.length - 1 ? 'disabled' : ''}>⬇️</button>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;margin:8px 0;font-size:0.78rem;color:#a0b4c8;">
+        <input type="checkbox" ${s.wide?'checked':''} onchange="sections[${i}].wide=this.checked;renderCard()"> সম্পূর্ণ প্রস্থে দেখাও
+      </label>
+      <div class="sub-sections-container">
+        <h4 style="color:#5bc0de;font-size:0.75rem;margin-bottom:8px;">📌 সাব-সেকশন</h4>
+        ${subsectionsHTML}
+        <button class="add-subsection-btn" onclick="sections[${i}].subsections.push({title:'নতুন সাব-সেকশন',icon:'📌',items:['তথ্য १']});renderDynSections();renderCard();">+ সাব-সেকশন</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function addSection() {
+  sections.push({
+    icon: "📌",
+    title: "নতুন সেকশন",
+    wide: false,
+    subsections: [{ title: "নতুন সাব-সেকশন", icon: "📌", items: ["তথ্য १"] }]
+  });
+  renderDynSections();
+  renderCard();
+}
+
+function removeSection(i) {
+  sections.splice(i, 1);
+  renderDynSections();
+  renderCard();
+}
+
+function moveSection(i, direction) {
+  if ((i === 0 && direction === -1) || (i === sections.length - 1 && direction === 1)) {
+    return;
+  }
+  [sections[i], sections[i + direction]] = [sections[i + direction], sections[i]];
+  renderDynSections();
+  renderCard();
+}
+
+function renderCard() {
+  const grid = document.getElementById('cardSectionsGrid');
+  grid.innerHTML = '';
+  sections.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'section-card' + (s.wide ? ' wide' : '');
+    
+    let subsectionsHTML = s.subsections.map(sub => `
+      <div class="subsection-group">
+        <div class="subsection-title">
+          <span class="subsection-icon">${sub.icon}</span>
+          ${sub.title}
+        </div>
+        ${sub.items.map(item => `<div class="bullet-item"><div class="bullet-dot"></div><span>${item}</span></div>`).join('')}
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="section-header">
+        <div class="icon">${s.icon}</div>
+        ${s.title}
+      </div>
+      <div class="section-body">
+        ${subsectionsHTML}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  markUnsaved();
+}
+
+function updateCard() {
+  document.getElementById('cName').textContent = document.getElementById('fName').value;
+  document.getElementById('cYears').textContent = document.getElementById('fYears').value;
+  document.getElementById('cSubtitle').textContent = document.getElementById('fSubtitle').value;
+  document.getElementById('cBirth').textContent = document.getElementById('fBirth').value;
+  document.getElementById('cBirthplace').textContent = document.getElementById('fBirthplace').value;
+  document.getElementById('cDeath').textContent = document.getElementById('fDeath').value;
+  document.getElementById('cDeathplace').textContent = document.getElementById('fDeathplace').value;
+  document.getElementById('cTitle').textContent = document.getElementById('fTitle').value;
+  document.getElementById('cTag').textContent = document.getElementById('fTag').value;
+  document.getElementById('cWebsite').textContent = document.getElementById('fWebsite').value;
+  applyColors();
+  renderCard();
+}
+
+function applyColors() {
+  const primary = document.getElementById('colorPrimary').value;
+  const accent = document.getElementById('colorAccent').value;
+  document.getElementById('colorPrimaryText').value = primary;
+  document.getElementById('colorAccentText').value = accent;
+  const card = document.getElementById('photoCard');
+  card.style.setProperty('--primary', primary);
+  card.style.setProperty('--accent', accent);
+  markUnsaved();
+}
+
+function syncColor(name) {
+  const textVal = document.getElementById('colorText' + name).value;
+  document.getElementById('color' + name).value = textVal;
+  applyColors();
+}
+
+function uploadImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imgBox = document.getElementById('personImgBox');
+    imgBox.innerHTML = `<img src="${e.target.result}" alt="ব্যক্তির ছবি">`;
+    document.getElementById('previewThumb').src = e.target.result;
+    document.getElementById('previewThumb').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function markUnsaved() {
+  clearTimeout(autoSaveTimeout);
+  document.getElementById('saveIndicator').textContent = 'সংরক্ষিত নয়';
+  document.getElementById('saveIndicator').style.color = '#f5a623';
+  autoSaveTimeout = setTimeout(() => {
+    saveData();
+  }, 3000);
+}
+
+function saveData() {
+  const data = {
+    name: document.getElementById('fName').value,
+    years: document.getElementById('fYears').value,
+    subtitle: document.getElementById('fSubtitle').value,
+    birth: document.getElementById('fBirth').value,
+    birthplace: document.getElementById('fBirthplace').value,
+    death: document.getElementById('fDeath').value,
+    deathplace: document.getElementById('fDeathplace').value,
+    title: document.getElementById('fTitle').value,
+    website: document.getElementById('fWebsite').value,
+    tag: document.getElementById('fTag').value,
+    colorPrimary: document.getElementById('colorPrimary').value,
+    colorAccent: document.getElementById('colorAccent').value,
+    sections: sections,
+    personImage: document.getElementById('personImgBox').innerHTML
+  };
+  
+  localStorage.setItem('photoCardData', JSON.stringify(data));
+  
+  document.getElementById('saveIndicator').textContent = 'সংরক্ষিত ✓';
+  document.getElementById('saveIndicator').style.color = '#27ae60';
+  
+  const notification = document.getElementById('saveNotification');
+  notification.classList.add('show');
+  setTimeout(() => notification.classList.remove('show'), 2000);
+  
+  lastSaveTime = new Date();
+}
+
+function loadData() {
+  const saved = localStorage.getItem('photoCardData');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      document.getElementById('fName').value = data.name || '';
+      document.getElementById('fYears').value = data.years || '';
+      document.getElementById('fSubtitle').value = data.subtitle || '';
+      document.getElementById('fBirth').value = data.birth || '';
+      document.getElementById('fBirthplace').value = data.birthplace || '';
+      document.getElementById('fDeath').value = data.death || '';
+      document.getElementById('fDeathplace').value = data.deathplace || '';
+      document.getElementById('fTitle').value = data.title || '';
+      document.getElementById('fWebsite').value = data.website || '';
+      document.getElementById('fTag').value = data.tag || '';
+      document.getElementById('colorPrimary').value = data.colorPrimary || '#1a3a6e';
+      document.getElementById('colorAccent').value = data.colorAccent || '#f5a623';
+      
+      if (data.sections) sections = data.sections;
+      if (data.personImage) document.getElementById('personImgBox').innerHTML = data.personImage;
+      
+      updateCard();
+      renderDynSections();
+    } catch (e) {
+      console.error('লোড করতে ত্রুটি:', e);
+    }
+  }
+}
+
+function downloadCard() {
+  const card = document.getElementById('photoCard');
+  html2canvas(card, { scale: 2, useCORS: true }).then(canvas => {
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = `photocard-${document.getElementById('fName').value.replace(/\s+/g, '_')}.png`;
+    link.click();
+  });
+}
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  renderDynSections();
+  renderCard();
+  updateCard();
+});
+</script>
+</body>
+</html>
