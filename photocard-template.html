@@ -19,6 +19,30 @@
     font-family: 'Hind Siliguri', sans-serif;
   }
 
+  /* ── Save Notification ── */
+  .save-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #27ae60;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+  }
+
+  .save-notification.show {
+    display: block;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
   /* ── Editor Panel ── */
   .editor-panel {
     background: #16213e;
@@ -26,7 +50,7 @@
     border-radius: 16px;
     padding: 24px;
     width: 100%;
-    max-width: 700px;
+    max-width: 800px;
     margin-bottom: 30px;
     color: #e0e0e0;
   }
@@ -37,6 +61,14 @@
     margin-bottom: 18px;
     border-bottom: 2px solid #0f3460;
     padding-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .save-indicator {
+    font-size: 0.8rem;
+    color: #5bc0de;
   }
 
   .form-grid {
@@ -117,8 +149,64 @@
     position: relative;
   }
 
+  .dyn-section-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .dyn-section-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn-move {
+    background: #1a4a7a;
+    border: none;
+    color: #e0e0e0;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .btn-move:hover { background: #1a6aa5; }
+  .btn-move:disabled { opacity: 0.5; cursor: not-allowed; }
+
   .dyn-section input, .dyn-section textarea {
     margin-bottom: 6px;
+  }
+
+  .sub-sections-container {
+    background: #051828;
+    border: 1px dashed #0f3460;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .sub-section {
+    background: #0f3460;
+    border: 1px solid #1a4a7a;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .sub-section:last-child { margin-bottom: 0; }
+
+  .sub-section-header {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
   }
 
   .remove-btn {
@@ -132,6 +220,21 @@
     cursor: pointer;
     font-size: 0.75rem;
     display: flex; align-items: center; justify-content: center;
+  }
+
+  .remove-btn-subsection {
+    background: #c0392b;
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
   .btn-primary {
@@ -163,6 +266,16 @@
   }
 
   .btn-secondary:hover { background: #1a6aa5; }
+
+  .btn-save {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    color: white;
+  }
+
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39,174,96,0.4);
+  }
 
   /* ── CARD ── */
   .card-wrapper {
@@ -400,25 +513,49 @@
     padding: 12px 16px;
   }
 
+  .subsection-group {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f2f8;
+  }
+
+  .subsection-group:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+
+  .subsection-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary, #1a3a6e);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .subsection-icon {
+    font-size: 0.75rem;
+  }
+
   .bullet-item {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    padding: 5px 0;
-    border-bottom: 1px solid #f0f2f8;
-    font-size: 0.85rem;
+    padding: 5px 0 5px 20px;
+    font-size: 0.82rem;
     color: #333;
     line-height: 1.4;
   }
 
-  .bullet-item:last-child { border-bottom: none; }
-
   .bullet-dot {
-    width: 8px; height: 8px;
+    width: 6px; height: 6px;
     background: var(--accent, #f5a623);
     border-radius: 50%;
     flex-shrink: 0;
-    margin-top: 5px;
+    margin-top: 4px;
+    position: relative;
+    left: -14px;
   }
 
   /* Footer */
@@ -448,6 +585,7 @@
     display: flex;
     gap: 12px;
     margin-top: 20px;
+    flex-wrap: wrap;
   }
 
   /* Image upload */
@@ -475,13 +613,35 @@
     display: none;
     margin: 6px auto 0;
   }
+
+  .add-subsection-btn {
+    background: #0f3460;
+    border: 1px dashed #5bc0de;
+    color: #5bc0de;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .add-subsection-btn:hover {
+    border-color: #f5a623;
+    color: #f5a623;
+  }
 </style>
 </head>
 <body>
 
+<!-- Save Notification -->
+<div class="save-notification" id="saveNotification">✓ স্বয়ংক্রিয়ভাবে সংরক্ষিত হয়েছে</div>
+
 <!-- ── EDITOR ── -->
 <div class="editor-panel">
-  <h2>✏️ ফটোকার্ড এডিটর</h2>
+  <h2>
+    ✏️ ফটোকার্ড এডিটর
+    <span class="save-indicator" id="saveIndicator">সংরক্ষিত</span>
+  </h2>
 
   <div class="form-grid">
     <!-- Colors -->
@@ -507,7 +667,7 @@
     </div>
     <div class="form-group">
       <label>জন্ম-মৃত্যু সাল</label>
-      <input id="fYears" type="text" value="(১৭৭২ - ১৮৩৩)" oninput="updateCard()">
+      <input id="fYears" type="text" value="(१७७२ - १८३३)" oninput="updateCard()">
     </div>
     <div class="form-group">
       <label>পরিচয় (ট্যাগলাইন)</label>
@@ -517,7 +677,7 @@
     <!-- Bio Fields -->
     <div class="form-group">
       <label>জন্ম তারিখ</label>
-      <input id="fBirth" type="text" value="২২ মে, ১৭৭২" oninput="updateCard()">
+      <input id="fBirth" type="text" value="२२ মে, १७७२" oninput="updateCard()">
     </div>
     <div class="form-group">
       <label>জন্মস্থান</label>
@@ -525,7 +685,7 @@
     </div>
     <div class="form-group">
       <label>মৃত্যু তারিখ</label>
-      <input id="fDeath" type="text" value="২৭ সেপ্টেম্বর ১৮৩৩" oninput="updateCard()">
+      <input id="fDeath" type="text" value="२७ सेप्टेम्बर १८३३" oninput="updateCard()">
     </div>
     <div class="form-group">
       <label>মৃত্যুস্থান</label>
@@ -534,7 +694,7 @@
 
     <div class="form-group full">
       <label>উপাধি / পুরস্কার</label>
-      <input id="fTitle" type="text" value="রাজা' [মুঘল সম্রাট দ্বিতীয় আকবর শাহ প্রদত্ত]" oninput="updateCard()">
+      <input id="fTitle" type="text" value="রাজা' [মুঘল সম্রাট দ্বিতীয় আ���বর শাহ প্রদত্ত]" oninput="updateCard()">
     </div>
 
     <!-- Image -->
@@ -560,12 +720,13 @@
 
   <!-- Dynamic Sections -->
   <div class="section-adder">
-    <h3>📂 সেকশন যোগ করুন (বুলেট পয়েন্ট)</h3>
+    <h3>📂 সেকশন যোগ করুন (নেস্টেড সাব-সেকশন সহ)</h3>
     <div class="dynamic-sections" id="dynSections"></div>
     <button class="btn-secondary" style="margin-top:10px" onclick="addSection()">+ নতুন সেকশন</button>
   </div>
 
   <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn-primary btn-save" onclick="saveData()">💾 সংরক্ষণ করুন</button>
     <button class="btn-primary" onclick="updateCard()">🔄 কার্ড আপডেট করুন</button>
     <button class="btn-primary" style="background:linear-gradient(135deg,#27ae60,#1e8449)" onclick="downloadCard()">⬇️ PNG ডাউনলোড করুন</button>
   </div>
@@ -590,7 +751,7 @@
       <div class="person-info">
         <div class="person-title">বিশেষ ব্যক্তিত্ব</div>
         <div class="person-name" id="cName">রাজা রামমোহন রায়</div>
-        <div class="person-years" id="cYears">(১৭৭২ - ১৮৩৩)</div>
+        <div class="person-years" id="cYears">(१७७२ - १८३३)</div>
         <div class="person-subtitle" id="cSubtitle">ভারতীয় সমাজ সংস্কারক</div>
       </div>
     </div>
@@ -600,12 +761,12 @@
   <div class="bio-bar">
     <div class="bio-item">
       <div class="bio-label">📅 জন্ম</div>
-      <div class="bio-value" id="cBirth">২২ মে, ১৭৭২</div>
+      <div class="bio-value" id="cBirth">२२ मে, १७७२</div>
       <div class="bio-sub" id="cBirthplace">রাধানগর, বেঙ্গল প্রেসিডেন্সি</div>
     </div>
     <div class="bio-item">
       <div class="bio-label">🪦 মৃত্যু</div>
-      <div class="bio-value" id="cDeath">২৭ সেপ্টেম্বর ১৮৩৩</div>
+      <div class="bio-value" id="cDeath">०२७ सेप्टेम्बर १८३३</div>
       <div class="bio-sub" id="cDeathplace">স্টাপলেটন, ব্রিস্টল</div>
     </div>
   </div>
@@ -639,52 +800,77 @@ const defaultSections = [
     icon: "🎓",
     title: "লেখাপড়া",
     wide: false,
-    items: [
-      "সংস্কৃত, ফারসি এবং ইংরেজি ভাষার একজন মহান পণ্ডিত",
-      "আরবি, ল্যাটিন এবং গ্রীক ভাষাও জানতেন"
+    subsections: [
+      {
+        title: "ভাষাজ্ঞান",
+        icon: "🗣️",
+        items: [
+          "সংস্কৃত, ফারসি এবং ইংরেজি ভাষার একজন মহান পণ্ডিত",
+          "আরবি, ল্যাটিন এবং গ্রীক ভাষাও জানতেন"
+        ]
+      }
     ]
   },
   {
     icon: "🤝",
     title: "পরিচিতি",
     wide: false,
-    items: [
-      "সতীদাহ প্রথা বিলোপ আন্দোলনের প্রধান পথিকৃৎ",
-      "লর্ড উইলিয়াম বেন্টিঙ্ক সতীদাহ প্রথাকে আইনত নিষিদ্ধ করেন"
+    subsections: [
+      {
+        title: "সামাজিক আন্দোলন",
+        icon: "⚡",
+        items: [
+          "সতীদাহ প্রথা বিলোপ আন্দোলনের প্রধান পথিকৃৎ",
+          "লর্ড উইলিয়াম বেন্টিঙ্ক সতীদাহ প্রথাকে আইনত নিষিদ্ধ করেন"
+        ]
+      }
     ]
   },
   {
     icon: "✍️",
-    title: "সম্পাদনা",
-    wide: false,
-    items: [
-      "ব্রাহ্মণসেবধি (১৮২১)",
-      "সম্বাদ কৌমুদী",
-      "ফারসি ভাষায় 'মিরাত-উল-আখবার' (১৮২২)"
+    title: "সাহিত্যকর্ম",
+    wide: true,
+    subsections: [
+      {
+        title: "প্রকাশিত সম্পাদনা",
+        icon: "📖",
+        items: [
+          "ব্রাহ্মণসেবধি (१८२१)",
+          "সম্বাদ কৌমুদী",
+          "ফারসি ভাষায় 'মিরাত-উল-আখবার' (१८२२)"
+        ]
+      },
+      {
+        title: "গুরুত্বপূর্ণ কর্মসমূহ",
+        icon: "📚",
+        items: [
+          "বেদান্তগ্রন্থ — বেদান্তসার",
+          "গোস্বামীর সহিত বিচার",
+          "গৌড়ীয় ব্যাকরণ (१८२६)"
+        ]
+      }
     ]
   },
   {
     icon: "🏛️",
-    title: "প্রতিষ্ঠা",
+    title: "প্রতিষ্ঠানিক কাজ",
     wide: false,
-    items: [
-      "১৮২২ খ্রিস্টাব্দে কলকাতায় 'অ্যাংলো হিন্দু স্কুল' প্রতিষ্ঠা",
-      "১৮২৮ সালে ব্রাহ্মসভা (পরবর্তীতে ব্রাহ্মসমাজ) প্রতিষ্ঠা"
-    ]
-  },
-  {
-    icon: "📚",
-    title: "প্রধান সাহিত্যকর্ম",
-    wide: true,
-    items: [
-      "বেদান্তগ্রন্থ — বেদান্তসার — ভট্টাচার্যের সহিত বিচার",
-      "গোস্বামীর সহিত বিচার — সহমরণ বিষয়ক প্রবর্তক ও নিবর্তকের সম্বাদ",
-      "গৌড়ীয় ব্যাকরণ (১৮২৬ সালে ইংরেজিতে রচিত; Bengali Grammar in the English Language)"
+    subsections: [
+      {
+        title: "স্থাপিত প্রতিষ্ঠান",
+        icon: "🏫",
+        items: [
+          "१८२२ খ্রিস্টাব্দে কলকাতায় 'অ্যাংলো হিন্দু স্কুল' প্রতিষ্ঠা",
+          "१८२८ সালে ব্রাহ্মসভা প্রতিষ্ঠা (পরবর্তীতে ব্রাহ্মসমাজ)"
+        ]
+      }
     ]
   }
 ];
 
 let sections = JSON.parse(JSON.stringify(defaultSections));
+let lastSaveTime = new Date();
+let autoSaveTimeout;
 
 function renderDynSections() {
   const container = document.getElementById('dynSections');
@@ -692,21 +878,48 @@ function renderDynSections() {
   sections.forEach((s, i) => {
     const div = document.createElement('div');
     div.className = 'dyn-section';
+    
+    let subsectionsHTML = s.subsections.map((sub, subI) => `
+      <div class="sub-section">
+        <div class="sub-section-header">
+          <input type="text" value="${sub.icon}" placeholder="আইকন" oninput="sections[${i}].subsections[${subI}].icon=this.value;renderCard()" style="width:50px;font-size:0.9rem;">
+          <input type="text" value="${sub.title}" placeholder="সাব-সেকশন শিরোনাম" oninput="sections[${i}].subsections[${subI}].title=this.value;renderCard()" style="flex:1;">
+          <button class="remove-btn-subsection" onclick="sections[${i}].subsections.splice(${subI},1);renderDynSections();renderCard();">×</button>
+        </div>
+        <textarea placeholder="বুলেট পয়েন্ট (প্রতিটি লাইনে একটি)" oninput="sections[${i}].subsections[${subI}].items=this.value.split('\\n').filter(x=>x.trim());renderCard()">${sub.items.join('\n')}</textarea>
+      </div>
+    `).join('');
+
     div.innerHTML = `
       <button class="remove-btn" onclick="removeSection(${i})">×</button>
-      <input type="text" value="${s.icon}" placeholder="আইকন (ইমোজি)" oninput="sections[${i}].icon=this.value;renderCard()" style="width:70px;display:inline-block;margin-right:8px;">
-      <input type="text" value="${s.title}" placeholder="সেকশন শিরোনাম" oninput="sections[${i}].title=this.value;renderCard()" style="width:calc(100% - 90px);display:inline-block;">
-      <label style="display:flex;align-items:center;gap:6px;margin:5px 0;font-size:0.78rem;color:#a0b4c8;">
+      <div class="dyn-section-header">
+        <input type="text" value="${s.icon}" placeholder="আইকন (ইমোজি)" oninput="sections[${i}].icon=this.value;renderCard()" style="width:60px;font-size:0.9rem;">
+        <input type="text" value="${s.title}" placeholder="সেকশন শিরোনাম" oninput="sections[${i}].title=this.value;renderCard()" style="flex:1;">
+        <div class="dyn-section-controls">
+          <button class="btn-move" onclick="moveSection(${i}, -1)" ${i === 0 ? 'disabled' : ''}>⬆️</button>
+          <button class="btn-move" onclick="moveSection(${i}, 1)" ${i === sections.length - 1 ? 'disabled' : ''}>⬇️</button>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;margin:8px 0;font-size:0.78rem;color:#a0b4c8;">
         <input type="checkbox" ${s.wide?'checked':''} onchange="sections[${i}].wide=this.checked;renderCard()"> সম্পূর্ণ প্রস্থে দেখাও
       </label>
-      <textarea placeholder="বুলেট পয়েন্ট (প্রতিটি লাইনে একটি)" oninput="sections[${i}].items=this.value.split('\\n').filter(x=>x.trim());renderCard()">${s.items.join('\n')}</textarea>
+      <div class="sub-sections-container">
+        <h4 style="color:#5bc0de;font-size:0.75rem;margin-bottom:8px;">📌 সাব-সেকশন</h4>
+        ${subsectionsHTML}
+        <button class="add-subsection-btn" onclick="sections[${i}].subsections.push({title:'নতুন সাব-সেকশন',icon:'📌',items:['তথ্য १']});renderDynSections();renderCard();">+ সাব-সেকশন যোগ করুন</button>
+      </div>
     `;
     container.appendChild(div);
   });
 }
 
 function addSection() {
-  sections.push({ icon: "📌", title: "নতুন সেকশন", wide: false, items: ["তথ্য ১", "তথ্য ২"] });
+  sections.push({
+    icon: "📌",
+    title: "নতুন সেকশন",
+    wide: false,
+    subsections: [{ title: "নতুন সাব-সেকশন", icon: "📌", items: ["তথ্য १"] }]
+  });
   renderDynSections();
   renderCard();
 }
@@ -717,23 +930,44 @@ function removeSection(i) {
   renderCard();
 }
 
+function moveSection(i, direction) {
+  if ((i === 0 && direction === -1) || (i === sections.length - 1 && direction === 1)) {
+    return;
+  }
+  [sections[i], sections[i + direction]] = [sections[i + direction], sections[i]];
+  renderDynSections();
+  renderCard();
+}
+
 function renderCard() {
   const grid = document.getElementById('cardSectionsGrid');
   grid.innerHTML = '';
   sections.forEach(s => {
     const card = document.createElement('div');
     card.className = 'section-card' + (s.wide ? ' wide' : '');
+    
+    let subsectionsHTML = s.subsections.map(sub => `
+      <div class="subsection-group">
+        <div class="subsection-title">
+          <span class="subsection-icon">${sub.icon}</span>
+          ${sub.title}
+        </div>
+        ${sub.items.map(item => `<div class="bullet-item"><div class="bullet-dot"></div><span>${item}</span></div>`).join('')}
+      </div>
+    `).join('');
+
     card.innerHTML = `
       <div class="section-header">
         <div class="icon">${s.icon}</div>
         ${s.title}
       </div>
       <div class="section-body">
-        ${s.items.map(item => `<div class="bullet-item"><div class="bullet-dot"></div><span>${item}</span></div>`).join('')}
+        ${subsectionsHTML}
       </div>
     `;
     grid.appendChild(card);
   });
+  markUnsaved();
 }
 
 function updateCard() {
@@ -759,6 +993,7 @@ function applyColors() {
   const card = document.getElementById('photoCard');
   card.style.setProperty('--primary', primary);
   card.style.setProperty('--accent', accent);
+  markUnsaved();
 }
 
 function syncColor(name) {
@@ -778,6 +1013,8 @@ function uploadImage(input) {
     const thumb = document.getElementById('previewThumb');
     thumb.src = e.target.result;
     thumb.style.display = 'block';
+    localStorage.setItem('photocard_image', e.target.result);
+    markUnsaved();
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -792,10 +1029,90 @@ function downloadCard() {
   });
 }
 
+function markUnsaved() {
+  clearTimeout(autoSaveTimeout);
+  document.getElementById('saveIndicator').textContent = 'সংরক্ষণ না করা হয়েছে';
+  document.getElementById('saveIndicator').style.color = '#e67e22';
+  
+  autoSaveTimeout = setTimeout(() => {
+    autoSave();
+  }, 2000);
+}
+
+function autoSave() {
+  saveData(true);
+}
+
+function saveData(isAutoSave = false) {
+  const data = {
+    name: document.getElementById('fName').value,
+    years: document.getElementById('fYears').value,
+    subtitle: document.getElementById('fSubtitle').value,
+    birth: document.getElementById('fBirth').value,
+    birthplace: document.getElementById('fBirthplace').value,
+    death: document.getElementById('fDeath').value,
+    deathplace: document.getElementById('fDeathplace').value,
+    title: document.getElementById('fTitle').value,
+    website: document.getElementById('fWebsite').value,
+    tag: document.getElementById('fTag').value,
+    colorPrimary: document.getElementById('colorPrimary').value,
+    colorAccent: document.getElementById('colorAccent').value,
+    sections: sections
+  };
+
+  localStorage.setItem('photocard_data', JSON.stringify(data));
+  lastSaveTime = new Date();
+  
+  document.getElementById('saveIndicator').textContent = 'সংরক্ষিত ✓';
+  document.getElementById('saveIndicator').style.color = '#5bc0de';
+  
+  if (!isAutoSave) {
+    const notif = document.getElementById('saveNotification');
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 2000);
+  }
+}
+
+function loadData() {
+  const saved = localStorage.getItem('photocard_data');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      document.getElementById('fName').value = data.name || '';
+      document.getElementById('fYears').value = data.years || '';
+      document.getElementById('fSubtitle').value = data.subtitle || '';
+      document.getElementById('fBirth').value = data.birth || '';
+      document.getElementById('fBirthplace').value = data.birthplace || '';
+      document.getElementById('fDeath').value = data.death || '';
+      document.getElementById('fDeathplace').value = data.deathplace || '';
+      document.getElementById('fTitle').value = data.title || '';
+      document.getElementById('fWebsite').value = data.website || '';
+      document.getElementById('fTag').value = data.tag || '';
+      document.getElementById('colorPrimary').value = data.colorPrimary || '#1a3a6e';
+      document.getElementById('colorAccent').value = data.colorAccent || '#f5a623';
+      if (data.sections && data.sections.length > 0) {
+        sections = data.sections;
+      }
+    } catch (e) {
+      console.error('লোড করতে ত্রুটি:', e);
+    }
+  }
+
+  const savedImage = localStorage.getItem('photocard_image');
+  if (savedImage) {
+    const imgBox = document.getElementById('personImgBox');
+    imgBox.innerHTML = `<img src="${savedImage}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;">`;
+    const thumb = document.getElementById('previewThumb');
+    thumb.src = savedImage;
+    thumb.style.display = 'block';
+  }
+}
+
 // Init
+loadData();
 renderDynSections();
 renderCard();
-applyColors();
+updateCard();
 </script>
 </body>
 </html>
